@@ -1,19 +1,14 @@
 # 组合器 × 多臂老虎机阶段汇报
 
-此站点为纯静态页面，图表和数据均内置于 `index.html`，无需安装依赖或构建。
+纯静态、多页面 GitHub Pages 站点，图表由内置 SVG 和 JavaScript 渲染，无外部依赖。
 
-## 部署到 GitHub Pages
+## 文件结构
 
-1. 将 `index.html`、`README.md`、`.nojekyll` 上传到仓库根目录。
-2. 在仓库 **Settings → Pages** 中选择 `Deploy from a branch`。
-3. 选择 `main` 分支与 `/(root)`，保存。
-4. 等待 GitHub Pages 完成部署，然后打开仓库 Pages 页面显示的站点地址。
+- `index.html`：总览首页
+- `pages/`：组合器、探索、确认迁移、消融、运行质量详情页
+- `assets/`：共享样式与图表脚本
+- `.nojekyll`：GitHub Pages 静态文件标记
 
-更新报告时，用新文件覆盖仓库中的同名文件并提交即可。
+部署时保持目录结构，将 ZIP 内所有内容上传到仓库根目录。启用 GitHub Pages 后，首页与详情页均可通过导航直接访问。更新时覆盖同名文件并提交。
 
-## 文件
-
-- `index.html`：响应式汇报网页；SVG 图表支持切换和悬停查看数据。
-- `.nojekyll`：允许 Pages 按原样提供静态文件。
-
-报告对任务输入作了脱敏处理，未包含原始提示文本或载荷内容。
+报告对任务标记作了脱敏处理，未包含原始提示文本或任务载荷。
