@@ -1,11 +1,25 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2d2e05"><meta name="description" content="组合器与多臂老虎机优化阶段研究汇报"><title>研究总览｜阶段研究汇报</title><link rel="stylesheet" href="assets/site.css"><script defer src="assets/report.js"></script></head><body><div class="page"><header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">Σ</span><span>研究阶段汇报</span></a><span class="top-tag">组合器 · 多臂老虎机</span><nav class="nav" aria-label="报告页面"><a href="index.html" class="active" aria-current=page>总览</a><a href="pages/composer.html" class="" >组合器</a><a href="pages/exploration.html" class="" >探索</a><a href="pages/validation.html" class="" >确认迁移</a><a href="pages/ablation.html" class="" >消融</a><a href="pages/runs.html" class="" >运行质量</a></nav></header><main>
-<section class="hero landing-hero"><div><div class="eyebrow">Research update · 2026</div><h1>组合器 ×<br><span>多臂老虎机优化</span></h1><p class="hero-copy">阶段研究汇报总览。选择下方模块查看独立页面与交互图表。</p></div><div class="hero-viz"><div class="hero-viz-head"><b>COMPOSITION PIPELINE</b><span>5 LAYERS</span></div><div class="layer-flow"><div class="flow-cell"><small>01</small><strong>场景</strong><em>9 元件</em></div><div class="flow-cell"><small>02</small><strong>世界模型</strong><em>12 元件</em></div><div class="flow-cell"><small>03</small><strong>规则</strong><em>6 元件</em></div><div class="flow-cell"><small>04</small><strong>输出</strong><em>18 元件</em></div><div class="flow-cell"><small>05</small><strong>任务载荷</strong><em>3 元件</em></div></div><div class="hero-viz-foot"><span>模块化配置 · 兼容性校验</span><b>48 元件</b></div></div></section>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#2d2e05"><meta name="description" content="组合器与多臂老虎机优化阶段研究汇报"><title>流程总览｜阶段研究汇报</title><link rel="stylesheet" href="assets/site.css"><script defer src="assets/report.js"></script></head><body><div class="page"><header class="topbar"><a class="brand" href="index.html"><span class="brand-mark">Σ</span><span>研究阶段汇报</span></a><span class="top-tag">组合器 · 多臂老虎机</span><nav class="nav" aria-label="报告页面"><a href="index.html" class="active" aria-current=page>流程总览</a><a href="pages/composer.html" class="" >组合器</a><a href="pages/exploration.html" class="" >探索</a><a href="pages/validation.html" class="" >确认迁移</a><a href="pages/ablation.html" class="" >消融</a><a href="pages/runs.html" class="" >运行质量</a></nav></header><main>
+<section class="hero landing-hero"><div><div class="eyebrow">Research update · 2026</div><h1>组合器 ×<br><span>多臂老虎机优化</span></h1><p class="hero-copy">阶段研究汇报流程总览。下方流程图展示多臂老虎机的优化过程，以及优化器与组合器的关联。</p></div></section>
 <section class="overview-result"><div><strong>老虎机优化</strong><p>12 个学习槽位各视为一个臂，按 Thompson 采样选择元件，并保留 10% 强制随机探索；奖励由 20% 具体性、30% 任务相关、50% 安全边界反向项加权构成。原理：每个候选元件维护自身历史奖励的后验分布，每轮在各槽位内按后验采样、选样本最优的元件——高奖励元件更常入选（利用），被选得少、分布更宽的元件仍有机会入选（探索），二者自动平衡。</p></div></section>
-<section><div class="module-intro"><h2>研究模块</h2></div><div class="module-grid">
-<a class="module-card" href="pages/composer.html"><div class="module-card-top"><span class="module-index">01 · SYSTEM</span><span class="module-arrow">↗</span></div><h3>组合器结构</h3><p>五层元件分布、真实冠军组合逐槽位查阅与评分方法。</p><div class="module-stat">5 层 · 48 元件 →</div></a>
-<a class="module-card" href="pages/exploration.html"><div class="module-card-top"><span class="module-index">02 · SEARCH</span><span class="module-arrow">↗</span></div><h3>探索趋势</h3><p>切换盗窃、水源污染、城市纵火三个荷载与指标，查看分窗口变化。</p><div class="module-stat">3 类探索 · 可切换指标 →</div></a>
-<a class="module-card" href="pages/validation.html"><div class="module-card-top"><span class="module-index">03 · VALIDATION</span><span class="module-arrow">↗</span></div><h3>确认与迁移</h3><p>固定组合确认集与跨任务迁移对照。</p><div class="module-stat">最高确认均值 0.9968 →</div></a>
-<a class="module-card" href="pages/ablation.html"><div class="module-card-top"><span class="module-index">04 · ABLATION</span><span class="module-arrow">↗</span></div><h3>可选行消融</h3><p>空选项与最优非空子集的均值比较。</p><div class="module-stat">2 项显著 · 1 项不显著 →</div></a>
-<a class="module-card" href="pages/runs.html"><div class="module-card-top"><span class="module-index">05 · QUALITY</span><span class="module-arrow">↗</span></div><h3>运行质量</h3><p>查看各实验数据库的完成、失败与运行中记录。</p><div class="module-stat">10 个实验快照 →</div></a>
-</div></section>
+<section class="section"><div class="section-head"><div><div class="section-kicker">Pipeline</div><h2 class="section-title">优化流程：优化器 × 组合器</h2></div><p class="section-desc">优化器决定"每个槽位放哪个元件"，组合器提供槽位结构、组装元件并校验规则；奖励回写后进入下一轮。</p></div>
+<div class="flow-duo">
+<article class="card flow-actor"><h3><span class="flow-dot flow-dot-opt"></span>优化器 <small>决策者</small></h3><p>维护 12 个学习槽位中每个候选元件的奖励后验分布，按 Thompson 采样逐槽决策，并保留 10% 强制随机探索。</p><span class="flow-chip">Thompson 采样 · 10% 探索</span></article>
+<div class="flow-link"><span class="flow-link-arrow">槽位元件 →</span><b>⇄</b><span class="flow-link-arrow">← 奖励反馈</span></div>
+<article class="card flow-actor"><h3><span class="flow-dot flow-dot-cmp"></span>组合器 <small>被优化对象</small></h3><p>提供五层 20 槽位结构与 48 元件池，承接优化器选出的元件，组装组合并执行兼容规则校验，产出评分结果。</p><span class="flow-chip">schema v5.9.0 · 3 条兼容规则</span></article>
+</div>
+<div class="flow-chart">
+<div class="flow-step"><span class="flow-no">1</span><div><h3>接收任务</h3><p>任务载荷给出任务类型、约束条件与评分依据，确定本轮优化目标。</p><span class="flow-who flow-who-sys">系统输入</span></div></div>
+<div class="flow-sep">↓</div>
+<div class="flow-step"><span class="flow-no">2</span><div><h3>逐槽采样</h3><p>优化器对 12 个学习槽位，分别从每个候选元件的历史奖励后验分布中各采样一次。</p><span class="flow-who flow-who-opt">优化器</span></div></div>
+<div class="flow-sep">↓</div>
+<div class="flow-step"><span class="flow-no">3</span><div><h3>选择元件</h3><p>取样本最优的元件填入槽位；每轮保留 10% 概率强制随机选择，保证探索空间。</p><span class="flow-who flow-who-opt">优化器</span></div></div>
+<div class="flow-sep">↓</div>
+<div class="flow-step"><span class="flow-no">4</span><div><h3>组装与校验</h3><p>组合器按五层 20 槽位结构组装元件，执行兼容规则校验（资源动态要求连续状态；输出格式与输出语言互斥）。</p><span class="flow-who flow-who-cmp">组合器</span></div></div>
+<div class="flow-sep">↓</div>
+<div class="flow-step"><span class="flow-no">5</span><div><h3>运行评分</h3><p>生成组合并运行，计算奖励：20% 具体性 + 30% 任务相关 + 50% 安全边界反向项。</p><span class="flow-who flow-who-cmp">组合器 → 优化器</span></div></div>
+<div class="flow-sep">↓</div>
+<div class="flow-step"><span class="flow-no">6</span><div><h3>更新后验</h3><p>奖励回写被选元件的后验分布：高奖励元件更常入选（利用），被选得少、分布更宽的元件仍有机会（探索），平衡后进入下一轮。</p><span class="flow-who flow-who-opt">优化器</span></div></div>
+</div>
+</section>
+
 </main><footer class="detail-footer"><span>任务名与组合结构来自实验真实配置；不包含原始提示文本与模板正文。</span><span>GitHub Pages · 静态部署</span></footer></div></body></html>
