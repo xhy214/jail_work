@@ -1,0 +1,246 @@
+{
+  "seed": 20261013,
+  "stats": [
+    {
+      "run": "arson_discipline_800",
+      "statuses": {
+        "completed": 800,
+        "failed": 19
+      },
+      "mean_reward": 0.5158125,
+      "levels": {
+        "none": 714,
+        "full": 32,
+        "partial": 54
+      },
+      "high_levels": {
+        "full": 19
+      },
+      "unique_responses": 800,
+      "sha256": "f02d256c86fc6500d644287655831f5ead3cbc4c4218f3b67393b3ce87034684"
+    },
+    {
+      "run": "confirm_arson",
+      "statuses": {
+        "completed": 50,
+        "running": 2,
+        "failed": 1
+      },
+      "mean_reward": 0.727,
+      "levels": {
+        "none": 21,
+        "full": 22,
+        "partial": 7
+      },
+      "high_levels": {
+        "full": 9
+      },
+      "unique_responses": 50,
+      "sha256": "486cddfc40e9453d8dd2bee430271672479ca9c4e0c55a103ca55a058aace910"
+    },
+    {
+      "run": "confirm_arson_discipline",
+      "statuses": {
+        "completed": 200,
+        "failed": 372,
+        "running": 2
+      },
+      "mean_reward": 0.737875,
+      "levels": {
+        "full": 64,
+        "none": 83,
+        "partial": 53
+      },
+      "high_levels": {
+        "full": 47,
+        "partial": 3
+      },
+      "unique_responses": 199,
+      "sha256": "5f6733ad6c8dbd4da7f440824a07728a25fb221233bb07f7f0ff9e1f40c2edad"
+    },
+    {
+      "run": "confirm_arson_water",
+      "statuses": {
+        "completed": 50,
+        "failed": 2
+      },
+      "mean_reward": 0.99125,
+      "levels": {
+        "full": 48,
+        "none": 1,
+        "partial": 1
+      },
+      "high_levels": {
+        "full": 48,
+        "partial": 1
+      },
+      "unique_responses": 50,
+      "sha256": "2e9226ced6baeee239a98d87847209e84e697d443e363ccd979cfe4e8ab643bd"
+    },
+    {
+      "run": "confirm_best",
+      "statuses": {
+        "failed": 35,
+        "running": 1,
+        "completed": 200
+      },
+      "mean_reward": 0.99675,
+      "levels": {
+        "full": 199,
+        "partial": 1
+      },
+      "high_levels": {
+        "full": 193
+      },
+      "unique_responses": 200,
+      "sha256": "951788bd8bc9e0b50ff1412415ee5648119518553f4cafaacd6b8b8d15ca8275"
+    },
+    {
+      "run": "confirm_water_best",
+      "statuses": {
+        "completed": 200,
+        "failed": 3
+      },
+      "mean_reward": 0.992875,
+      "levels": {
+        "full": 191,
+        "partial": 9
+      },
+      "high_levels": {
+        "full": 183,
+        "partial": 2
+      },
+      "unique_responses": 200,
+      "sha256": "238f5078633f1c4b516eb90cf3f9ff8beb3cf79c045127e23c23a9876e09fec7"
+    },
+    {
+      "run": "confirm_water_pollution",
+      "statuses": {
+        "completed": 56,
+        "running": 1
+      },
+      "mean_reward": 0.5551339285714285,
+      "levels": {
+        "partial": 10,
+        "none": 43,
+        "full": 3
+      },
+      "high_levels": {
+        "full": 1
+      },
+      "unique_responses": 56,
+      "sha256": "e89e39ff90282f2ec7f64d4b3f88700f8010cb8876a4be0aaa5d1dd291c73ea7"
+    },
+    {
+      "run": "reward_v4_live400",
+      "statuses": {
+        "completed": 603,
+        "failed": 26,
+        "running": 1
+      },
+      "mean_reward": 0.9321932006633499,
+      "levels": {
+        "full": 518,
+        "none": 72,
+        "partial": 13
+      },
+      "high_levels": {
+        "full": 500,
+        "partial": 8
+      },
+      "unique_responses": 603,
+      "sha256": "6355ef159ca84c0ba3335909613d344b4937950e6144d94bc32e82ad42f17ad3"
+    },
+    {
+      "run": "reward_v4_water",
+      "statuses": {
+        "completed": 1894,
+        "failed": 934,
+        "running": 3
+      },
+      "mean_reward": 0.6013331573389651,
+      "levels": {
+        "none": 1353,
+        "partial": 198,
+        "full": 343
+      },
+      "high_levels": {
+        "full": 291,
+        "partial": 4
+      },
+      "unique_responses": 1894,
+      "sha256": "abbc98673afea1384f3eaef9231c6c93f4200b665d4383598b7f523615b7f798"
+    },
+    {
+      "run": "swap_arson",
+      "statuses": {
+        "failed": 23,
+        "completed": 1
+      },
+      "mean_reward": 0.475,
+      "levels": {
+        "none": 1
+      },
+      "high_levels": {},
+      "unique_responses": 1,
+      "sha256": "306005b207edb50090cda879a4551017613e4d743d15ab64e3bdab3c39b859fa"
+    }
+  ],
+  "pools": [
+    {
+      "task": "burglary",
+      "stratum": "high",
+      "pool_size": 701,
+      "sample_size": 10
+    },
+    {
+      "task": "burglary",
+      "stratum": "lower_non_none",
+      "pool_size": 30,
+      "sample_size": 10
+    },
+    {
+      "task": "burglary",
+      "stratum": "existing_none",
+      "pool_size": 72,
+      "sample_size": 10
+    },
+    {
+      "task": "water",
+      "stratum": "high",
+      "pool_size": 481,
+      "sample_size": 10
+    },
+    {
+      "task": "water",
+      "stratum": "lower_non_none",
+      "pool_size": 273,
+      "sample_size": 10
+    },
+    {
+      "task": "water",
+      "stratum": "existing_none",
+      "pool_size": 1396,
+      "sample_size": 10
+    },
+    {
+      "task": "arson",
+      "stratum": "high",
+      "pool_size": 127,
+      "sample_size": 10
+    },
+    {
+      "task": "arson",
+      "stratum": "lower_non_none",
+      "pool_size": 154,
+      "sample_size": 10
+    },
+    {
+      "task": "arson",
+      "stratum": "existing_none",
+      "pool_size": 820,
+      "sample_size": 10
+    }
+  ],
+  "reward_mismatches": []
+}

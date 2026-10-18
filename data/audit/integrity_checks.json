@@ -1,0 +1,62 @@
+[
+  {
+    "run": "arson_discipline_800",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "confirm_arson",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "confirm_arson_discipline",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "confirm_arson_water",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "confirm_best",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "confirm_water_best",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "confirm_water_pollution",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "reward_v4_live400",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "reward_v4_water",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  },
+  {
+    "run": "swap_arson",
+    "integrity": "ok",
+    "completed_missing_fields": 0,
+    "dry_run_flags": 0
+  }
+]
