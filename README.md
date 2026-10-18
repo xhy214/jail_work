@@ -2,6 +2,16 @@
 
 纯 HTML/CSS/JavaScript 网站，无项目依赖安装或构建步骤。
 
+## 本轮新增方法与已执行实验
+
+- [部分回答敏感性与排名翻转](pages/contribution.html)：新增交互实验页面。
+- [新贡献定义、推导与一分钟讲稿](docs/new-contribution.md)。
+- [复算代码](scripts/ranking_sensitivity.py)与[101点扫描结果](data/audit/ranking_sensitivity.json)。
+
+新结果：同一目标任务两运行组在partial权重λ=0.96处交换排名；平均reward次序与完整内容比例次序相反。这是原裁判标签下的描述性发现，不是独立验证的攻击成功率。方法属于敏感性分析的评测应用，新颖性尚待文献检索。
+
+运行 `python3 scripts/ranking_sensitivity.py` 可从公开聚合数据完全复现，无需API。
+
 ## 2026-10-18 汇报入口
 
 - [流程总览](index.html)：实验框架与本轮材料入口。
