@@ -2,6 +2,20 @@
 
 纯 HTML/CSS/JavaScript 网站，无项目依赖安装或构建步骤。
 
+## 模型边界一致性测试代码
+
+[使用文档](docs/boundarycheck.md) · [核心代码](boundarycheck/core.py) · [演示配置](examples/boundary_demo.json)
+
+保持同一测试请求，只改单个显示因素，并加入原样重复对照。首版自动判定合成内部标记保护和无害算术；更广泛内容安全测试需要另行接入标注。
+
+```sh
+python3 -m boundarycheck plan --config examples/boundary_demo.json
+python3 -m boundarycheck run --config examples/boundary_demo.json --mode mock --output runs/boundary-demo
+python3 -m unittest discover -s tests -v
+```
+
+14项测试和192次模拟调用已通过。模拟结果不是实际模型漏洞；真实运行使用`--mode live`，并安全配置`TARGET_API_BASE`、`TARGET_MODEL`、`TARGET_API_KEY`。
+
 ## 本轮新增方法与已执行实验
 
 - [部分回答敏感性与排名翻转](pages/contribution.html)：新增交互实验页面。
