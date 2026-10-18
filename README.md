@@ -26,7 +26,7 @@ python3 -m boundarycheck run --config examples/boundary_demo.json --mode mock --
 python3 -m unittest discover -s tests -v
 ```
 
-17项测试和192次模拟调用已通过。模拟结果不是实际模型漏洞；真实运行使用`--mode live`，并安全配置`TARGET_API_BASE`、`TARGET_MODEL`、`TARGET_API_KEY`。
+20项测试和192次模拟调用已通过。模拟结果不是实际模型漏洞；真实运行使用`--mode live`，并安全配置`TARGET_API_BASE`、`TARGET_MODEL`、`TARGET_API_KEY`。
 
 ## 本轮新增方法与已执行实验
 

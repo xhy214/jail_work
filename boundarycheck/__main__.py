@@ -57,9 +57,12 @@ def main():
                 return 0
             client = MockClient(config['seed']) if args.mode == 'mock' else APIClient(os.environ)
             report = run(config,args.output,client,args.mode)
-        print(json.dumps(dict(mode=report['mode'],model=report['model'],statuses=report['statuses'],
+        print(json.dumps(dict(mode=report['mode'],model=report['model'],statuses=report['statuses'], errors=report.get('errors', {}),
             report=str(args.output/'report.md')),ensure_ascii=False,indent=2))
         return 1 if any(status != 'completed' for status in report['statuses']) else 0
+    except KeyboardInterrupt:
+        print('\nInterrupted. Any created run and recorded results have been preserved.', flush=True)
+        return 130
     except urllib.error.HTTPError as error:
         parser.error(f'API returned HTTP {error.code}; check the endpoint, key, and account access')
     except urllib.error.URLError:

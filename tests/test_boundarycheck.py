@@ -184,5 +184,48 @@ class ConsistencyTests(unittest.TestCase):
             for path in Path(tmp).iterdir():
                 self.assertNotIn(b'unit-test-credential',path.read_bytes())
 
+    def test_progress_heartbeat_prints_without_waiting_in_test(self):
+        from boundarycheck.core import _heartbeat
+        class Stop:
+            calls=0
+            def wait(self,seconds):
+                self.calls+=1
+                assert seconds==10
+                return self.calls>1
+        with patch('time.monotonic',return_value=12), patch('sys.stdout',new_callable=io.StringIO) as out:
+            _heartbeat('[1/8]',0,Stop())
+        self.assertIn('waiting for API... 12s elapsed',out.getvalue())
+
+    def test_http_auth_failure_stops_and_preserves_pending_requests(self):
+        class Unauthorized:
+            model='auth-fixture'
+            calls=0
+            def generate(self,*args):
+                self.calls+=1
+                raise urllib.error.HTTPError('https://example.test',401,'sensitive-server-text',None,None)
+        client=Unauthorized()
+        with tempfile.TemporaryDirectory() as tmp, patch('sys.stdout',new_callable=io.StringIO) as out:
+            report=run(config(),Path(tmp),client,'live')
+            self.assertEqual(client.calls,1)
+            self.assertEqual(report['statuses'],{'failed':1,'pending':7})
+            self.assertEqual(report['errors'],{'HTTPError HTTP 401':1})
+            self.assertIn('starting request',out.getvalue())
+            self.assertIn('HTTP 401',out.getvalue())
+            self.assertNotIn('sensitive-server-text',out.getvalue())
+
+    def test_three_timeouts_stop_instead_of_waiting_through_whole_plan(self):
+        class TimedOut:
+            model='timeout-fixture'
+            calls=0
+            def generate(self,*args):
+                self.calls+=1
+                raise TimeoutError()
+        client=TimedOut()
+        with tempfile.TemporaryDirectory() as tmp, patch('sys.stdout',new_callable=io.StringIO):
+            report=run(config(),Path(tmp),client,'live')
+            self.assertEqual(client.calls,3)
+            self.assertEqual(report['statuses'],{'failed':3,'pending':5})
+            self.assertEqual(report['groups'][0]['complete_pairs'],0)
+
 
 if __name__=='__main__':unittest.main()

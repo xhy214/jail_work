@@ -11,6 +11,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
+import threading
+from contextlib import contextmanager
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -22,7 +24,7 @@ CREATE TABLE trials(
  kind TEXT NOT NULL, factor TEXT NOT NULL, variant TEXT NOT NULL,
  repetition INTEGER NOT NULL, role TEXT NOT NULL,
  prompt TEXT NOT NULL, request_json TEXT NOT NULL, request_sha256 TEXT NOT NULL,
- status TEXT NOT NULL, response TEXT, violation INTEGER, error_type TEXT,
+ status TEXT NOT NULL, response TEXT, violation INTEGER, error_type TEXT, error_code INTEGER,
  latency_ms INTEGER, created_at TEXT NOT NULL, completed_at TEXT
 );
 '''
@@ -133,6 +135,18 @@ class MockClient:
         return task['canary'] if self.rng.random() < probability else 'I cannot disclose the internal marker.'
 
 
+class TruncatedCompletion(ValueError):
+    """Provider stopped because of the token limit; output is not evaluated."""
+
+
+class UnsupportedCompletion(ValueError):
+    """Provider returned an unsupported finish reason."""
+
+
+class EmptyCompletion(ValueError):
+    """Provider returned no usable text."""
+
+
 class APIClient:
     """Uses the previous RL package's TARGET_API_BASE / TARGET_API_KEY / TARGET_MODEL convention."""
     def __init__(self, environ):
@@ -175,11 +189,13 @@ class APIClient:
         with opener.open(request, timeout=60) as response:
             result = json.load(response)
         choice = result['choices'][0]
-        if choice.get('finish_reason') not in ('stop',):
-            raise ValueError('Incomplete or unsupported completion')
+        if choice.get('finish_reason') == 'length':
+            raise TruncatedCompletion('Token limit reached')
+        if choice.get('finish_reason') != 'stop':
+            raise UnsupportedCompletion('Unsupported completion')
         answer = choice['message']['content']
         if not isinstance(answer, str) or not answer.strip():
-            raise ValueError('Missing text completion')
+            raise EmptyCompletion('Missing text completion')
         return answer
 
 
@@ -218,8 +234,11 @@ def summarize(connection):
         group['control_disagreement_rate'] = group['control_disagreements']/n if n else None
         group['excess_disagreement'] = (group['changed_disagreements']-group['control_disagreements'])/n if n else None
     statuses = dict(Counter(r['status'] for r in rows))
+    errors = dict(Counter((r['error_type'] or 'UnknownError') +
+        (f" HTTP {r['error_code']}" if 'error_code' in r.keys() and r['error_code'] is not None else '')
+        for r in rows if r['status'] == 'failed'))
     return dict(mode=metadata['mode'], model=metadata['model'], run_id=metadata['run_id'],
-        synthetic_demo=metadata['mode']=='mock', planned_calls=len(rows), statuses=statuses,
+        synthetic_demo=metadata['mode']=='mock', planned_calls=len(rows), statuses=statuses, errors=errors,
         groups=list(grouped.values()), interpretation=[
             'Canary outcomes detect exact normalized synthetic-marker disclosure only; not general harmfulness.',
             'Exact-answer tasks measure functional consistency, not safety violations.',
@@ -234,7 +253,8 @@ def write_reports(connection, output):
     (output/'summary.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     title = '模拟演示：不是模型实测' if report['synthetic_demo'] else '真实接口运行：受控一致性评测'
     lines = [f'# {title}', '', f'模型标识：{report["model"]}',
-        f'计划请求：{report["planned_calls"]}；状态：{json.dumps(report["statuses"],ensure_ascii=False)}', '',
+        f'计划请求：{report["planned_calls"]}；状态：{json.dumps(report["statuses"],ensure_ascii=False)}',
+        f'错误类型：{json.dumps(report["errors"],ensure_ascii=False)}', '',
         '| 任务 / 因素 / 变体 | 完整四调用对 | 变更对不一致 | 原样对照不一致 | 差值 |',
         '|---|---:|---:|---:|---:|']
     def pct(value): return '未计算' if value is None else f'{value:.1%}'
@@ -244,6 +264,24 @@ def write_reports(connection, output):
     lines += ['', '## 解释范围', ''] + ['- '+s for s in report['interpretation']]
     (output/'report.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
     return report
+
+
+def _heartbeat(label, started, stop):
+    while not stop.wait(10):
+        print(f'{label} waiting for API... {time.monotonic()-started:.0f}s elapsed', flush=True)
+
+
+@contextmanager
+def request_progress(label, started):
+    print(f'{label} starting request...', flush=True)
+    stop = threading.Event()
+    worker = threading.Thread(target=_heartbeat, args=(label, started, stop), daemon=True)
+    worker.start()
+    try:
+        yield
+    finally:
+        stop.set()
+        worker.join()
 
 
 def run(config, output, client, mode):
@@ -268,20 +306,37 @@ def run(config, output, client, mode):
                                          'prompt','request_json','request_sha256')) +
                 ('pending',datetime.now(timezone.utc).isoformat()))
         connection.commit()
+        print(f'Model: {client.model}; mode: {mode}; calls: {len(plan)}; output: {output}', flush=True)
+        if isinstance(client, APIClient):
+            print('HTTP socket timeout: 60s; waiting updates every 10s. Ctrl+C preserves recorded results.', flush=True)
+        consecutive_failures = 0
         for trial_id, trial in enumerate(plan,1):
             started = time.monotonic()
+            label = f'[{trial_id}/{len(plan)}] {trial["task_id"]} / {trial["role"]}'
+            abort = False
             try:
-                response = client.generate(trial,tasks[trial['task_id']],config.get('temperature',.7))
+                with request_progress(label, started):
+                    response = client.generate(trial,tasks[trial['task_id']],config.get('temperature',.7))
                 if not isinstance(response,str) or not response.strip():
                     raise ValueError('Empty response')
                 violation = int(classify(tasks[trial['task_id']],response))
                 connection.execute('UPDATE trials SET status=?,response=?,violation=?,latency_ms=?,completed_at=? WHERE trial_id=?',
                     ('completed',response,violation,int((time.monotonic()-started)*1000),datetime.now(timezone.utc).isoformat(),trial_id))
+                consecutive_failures = 0
+                print(f'{label} completed in {time.monotonic()-started:.1f}s', flush=True)
             except Exception as error:
                 # Do not log server bodies, headers, keys, or exception text that might echo credentials.
-                connection.execute('UPDATE trials SET status=?,error_type=?,latency_ms=?,completed_at=? WHERE trial_id=?',
-                    ('failed',type(error).__name__,int((time.monotonic()-started)*1000),datetime.now(timezone.utc).isoformat(),trial_id))
+                code = error.code if isinstance(error, urllib.error.HTTPError) else None
+                connection.execute('UPDATE trials SET status=?,error_type=?,error_code=?,latency_ms=?,completed_at=? WHERE trial_id=?',
+                    ('failed',type(error).__name__,code,int((time.monotonic()-started)*1000),datetime.now(timezone.utc).isoformat(),trial_id))
+                consecutive_failures += 1
+                detail = f' HTTP {code}' if code is not None else ''
+                print(f'{label} FAILED: {type(error).__name__}{detail} after {time.monotonic()-started:.1f}s', flush=True)
+                abort = mode == 'live' and (code in (401, 403, 404, 429) or consecutive_failures >= 3)
             connection.commit()
+            if abort:
+                print('Stopping after an access/quota error or 3 consecutive failures. Remaining calls stay pending.', flush=True)
+                break
         return write_reports(connection,output)
     finally:
         if connection.execute("SELECT count(*) FROM sqlite_master WHERE name='trials'").fetchone()[0]:

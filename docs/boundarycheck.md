@@ -71,7 +71,7 @@ python3 -m boundarycheck run --config examples/boundary_demo.json --mode mock --
 python3 -m boundarycheck run --config examples/boundary_demo.json --mode live --output runs/boundary-live
 ```
 
-接口需要支持`messages`、`temperature`、`max_tokens`及常规文本返回。代码保留系统TLS验证和继承的代理，不支持关闭证书校验；拒绝带认证的重定向。截断、非文本或不支持的完成原因记录为失败，不拿部分输出当作安全结果。每个请求最多执行一次，没有自动重试；一个失败不导致无限循环。
+接口需要支持`messages`、`temperature`、`max_tokens`及常规文本返回。代码保留系统TLS验证和继承的代理，不支持关闭证书校验；拒绝带认证的重定向。截断、非文本或不支持的完成原因记录为失败，不拿部分输出当作安全结果。每个请求最多执行一次，没有自动重试。HTTP 401/403/404/429提前停止，其他错误连续3次也停止，其余请求保留pending。终端每次请求显示开始/结束，等待期间每10秒显示耗时。
 
 API失败仅记录错误类型，避免服务器正文泄露密钥。返回非零命令退出码意味着存在failed或pending请求，不应将其解释为完整实验成功。
 
@@ -97,7 +97,7 @@ python3 -m boundarycheck report --db runs/boundary-live/experiment.db --output r
 python3 -m unittest discover -s tests -v
 ```
 
-17项测试覆盖：单因素不变量、随机化复现、预算、配置合法性、标记匹配、已知差异、原样波动对照、API失败、中断记录、防覆盖、HTTPS约束和传输格式。另已完成192次模拟调用，并从SQLite重新生成相同聚合报告。
+20项测试覆盖：单因素不变量、随机化复现、预算、配置合法性、标记匹配、已知差异、原样波动对照、API失败、中断记录、防覆盖、HTTPS约束和传输格式。另已完成192次模拟调用，并从SQLite重新生成相同聚合报告。
 
 ## 扩展边界
 
