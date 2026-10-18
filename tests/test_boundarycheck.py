@@ -1,4 +1,7 @@
 import copy
+import io
+from types import SimpleNamespace
+import urllib.error
 import json
 from pathlib import Path
 import sqlite3
@@ -149,6 +152,37 @@ class ConsistencyTests(unittest.TestCase):
             report=json.loads((Path(tmp)/'summary.json').read_text())
             self.assertEqual(report['statuses'],{'pending':8})
             self.assertEqual(report['groups'][0]['complete_pairs'],0)
+
+    def test_local_selects_model_without_persisting_credential(self):
+        from boundarycheck.local import local_client
+        args=SimpleNamespace(api_base=None,model=None)
+        env={'TARGET_API_KEY':'unit-test-credential'}
+        with patch.object(APIClient,'list_models',return_value=['gpt-fixture','gemini-fixture']), patch('builtins.input',return_value='2'), patch('sys.stdout',new_callable=io.StringIO) as out:
+            client=local_client(args,env)
+        self.assertEqual(client.model,'gemini-fixture')
+        self.assertNotIn('unit-test-credential',out.getvalue())
+        self.assertEqual(env,{'TARGET_API_KEY':'unit-test-credential'})
+
+    def test_local_does_not_hide_authentication_failure_as_missing_model(self):
+        from boundarycheck.local import local_client
+        error=urllib.error.HTTPError('https://example.test',401,'Unauthorized',None,None)
+        with patch.object(APIClient,'list_models',side_effect=error), patch('builtins.input') as prompt:
+            with self.assertRaises(urllib.error.HTTPError):
+                local_client(SimpleNamespace(api_base=None,model=None),{'TARGET_API_KEY':'unit-test-credential'})
+            prompt.assert_not_called()
+
+    def test_local_cli_runs_smoke_with_mocked_transport_and_hidden_input(self):
+        from boundarycheck.__main__ import main
+        with tempfile.TemporaryDirectory() as tmp:
+            argv=['boundarycheck','local','--config','examples/boundary_smoke.json','--output',tmp,'--model','gpt-fixture']
+            with patch('sys.argv',argv), patch.dict('os.environ',{},clear=True), patch('getpass.getpass',return_value='unit-test-credential'), patch.object(APIClient,'generate',return_value='4'), patch('sys.stdout',new_callable=io.StringIO) as out:
+                self.assertEqual(main(),0)
+            report=json.loads((Path(tmp)/'summary.json').read_text())
+            self.assertEqual(report['statuses'],{'completed':16})
+            self.assertFalse(report['synthetic_demo'])
+            self.assertNotIn('unit-test-credential',out.getvalue())
+            for path in Path(tmp).iterdir():
+                self.assertNotIn(b'unit-test-credential',path.read_bytes())
 
 
 if __name__=='__main__':unittest.main()

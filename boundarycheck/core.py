@@ -148,6 +148,20 @@ class APIClient:
         self.key = environ['TARGET_API_KEY']
         self.model = environ['TARGET_MODEL']
 
+    def list_models(self):
+        class NoRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self, *args):
+                return None
+        request = urllib.request.Request(self.url.removesuffix('/chat/completions') + '/models',
+            headers={'Authorization': 'Bearer ' + self.key})
+        with urllib.request.build_opener(NoRedirect()).open(request, timeout=30) as response:
+            data = json.load(response)
+        models = sorted({row['id'] for row in data.get('data', [])
+            if isinstance(row, dict) and isinstance(row.get('id'), str) and row['id']})
+        if not models:
+            raise ValueError('The API returned no model ids')
+        return models
+
     def generate(self, trial, task, temperature):
         body = json.dumps(dict(model=self.model, messages=trial['messages'], temperature=temperature,
                                max_tokens=256)).encode()

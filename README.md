@@ -2,6 +2,18 @@
 
 纯 HTML/CSS/JavaScript 网站，无项目依赖安装或构建步骤。
 
+## 本地直接跑
+
+Python 3.10+，无需安装依赖：
+
+```sh
+git clone https://github.com/xhy214/jail_work.git
+cd jail_work
+python -m boundarycheck local
+```
+
+终端隐藏输入API key，再从实际模型列表中选模型。默认使用已给定的API地址，执行16次小规模真实调用。结果保存在被Git忽略的`runs/local-*`目录。[完整本地说明](docs/local-quickstart.md)。
+
 ## 模型边界一致性测试代码
 
 [使用文档](docs/boundarycheck.md) · [核心代码](boundarycheck/core.py) · [演示配置](examples/boundary_demo.json)
@@ -14,7 +26,7 @@ python3 -m boundarycheck run --config examples/boundary_demo.json --mode mock --
 python3 -m unittest discover -s tests -v
 ```
 
-14项测试和192次模拟调用已通过。模拟结果不是实际模型漏洞；真实运行使用`--mode live`，并安全配置`TARGET_API_BASE`、`TARGET_MODEL`、`TARGET_API_KEY`。
+17项测试和192次模拟调用已通过。模拟结果不是实际模型漏洞；真实运行使用`--mode live`，并安全配置`TARGET_API_BASE`、`TARGET_MODEL`、`TARGET_API_KEY`。
 
 ## 本轮新增方法与已执行实验
 

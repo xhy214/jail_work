@@ -3,6 +3,8 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+import urllib.error
+from datetime import datetime
 
 from .core import APIClient, MockClient, run, validate_config, write_reports
 
@@ -19,9 +21,29 @@ def main():
     command = commands.add_parser('report')
     command.add_argument('--db', type=Path, required=True)
     command.add_argument('--output', type=Path, required=True)
+    command = commands.add_parser('local', help='Interactive local run; API key is entered without echo')
+    command.add_argument('--config', type=Path, default=Path('examples/boundary_smoke.json'))
+    command.add_argument('--output', type=Path)
+    command.add_argument('--api-base', default=None)
+    command.add_argument('--model', default=None)
+    command = commands.add_parser('models', help='List model IDs using local credentials')
+    command.add_argument('--api-base', default=None)
     args = parser.parse_args()
     try:
-        if args.command == 'report':
+        if args.command in ('local', 'models'):
+            from .local import local_client
+            if args.command == 'local':
+                config = json.loads(args.config.read_text(encoding='utf-8'))
+                count = validate_config(config)
+                args.output = args.output or Path('runs') / datetime.now().strftime('local-%Y%m%d-%H%M%S-%f')
+                if (args.output / 'experiment.db').exists():
+                    raise FileExistsError()
+                print(f'Planned calls: {count}; results: {args.output}')
+            client = local_client(args, os.environ, discover_only=args.command == 'models')
+            if args.command == 'models':
+                return 0
+            report = run(config, args.output, client, 'live')
+        elif args.command == 'report':
             args.output.mkdir(parents=True,exist_ok=True)
             with sqlite3.connect(args.db.resolve().as_uri()+'?mode=ro',uri=True) as connection:
                 report = write_reports(connection,args.output)
@@ -38,6 +60,10 @@ def main():
         print(json.dumps(dict(mode=report['mode'],model=report['model'],statuses=report['statuses'],
             report=str(args.output/'report.md')),ensure_ascii=False,indent=2))
         return 1 if any(status != 'completed' for status in report['statuses']) else 0
+    except urllib.error.HTTPError as error:
+        parser.error(f'API returned HTTP {error.code}; check the endpoint, key, and account access')
+    except urllib.error.URLError:
+        parser.error('API connection failed; check network access, HTTPS certificates, and proxy configuration')
     except (ValueError, KeyError, FileNotFoundError, FileExistsError, json.JSONDecodeError) as error:
         # Configuration errors are local, controlled messages. API errors are recorded by type in SQLite.
         if isinstance(error,FileExistsError):

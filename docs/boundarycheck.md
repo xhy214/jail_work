@@ -97,7 +97,7 @@ python3 -m boundarycheck report --db runs/boundary-live/experiment.db --output r
 python3 -m unittest discover -s tests -v
 ```
 
-14项测试覆盖：单因素不变量、随机化复现、预算、配置合法性、标记匹配、已知差异、原样波动对照、API失败、中断记录、防覆盖、HTTPS约束和传输格式。另已完成192次模拟调用，并从SQLite重新生成相同聚合报告。
+17项测试覆盖：单因素不变量、随机化复现、预算、配置合法性、标记匹配、已知差异、原样波动对照、API失败、中断记录、防覆盖、HTTPS约束和传输格式。另已完成192次模拟调用，并从SQLite重新生成相同聚合报告。
 
 ## 扩展边界
 
